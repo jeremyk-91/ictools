@@ -4,6 +4,10 @@
 
 # Modules Supported
 
-- C220 Software Engineering Algorithms
-  - Levenshtein Distance
-  - Ford-Fulkerson (implemented via Edmonds-Karp)
+- C493 Intelligent Data and Probabilistic Inference (coming soon)
+  - Probability Propagation in Bayesian Networks
+  - Message Propagation
+  - Cause and Independence
+  - Dependency Metrics
+  - Principal Components Analysis
+  - Linear Discriminant Analysis
