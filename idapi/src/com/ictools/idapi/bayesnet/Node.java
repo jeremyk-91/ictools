@@ -3,9 +3,11 @@ package com.ictools.idapi.bayesnet;
 import java.util.List;
 
 public interface Node {
-    int getDimensionality();
-    List<Double> getPosteriorDistribution();
+    public String getIdentifier();
+    public int getDimensionality();
+    public List<Double> getPosteriorDistribution();
 
-    void receiveLambdaMessage(LambdaMessage m);
-    void receivePiMessage(PiMessage m);
+    public void receiveLambdaMessage(LambdaMessage m);
+    public void receivePiMessage(PiMessage m);
+    public void instantiate(int value);
 }
