@@ -1,10 +1,13 @@
-apply plugin: 'java'
-apply plugin: 'idea'
-
-repositories {
-  mavenCentral()
+allprojects {
+    apply plugin: 'java'
+    apply plugin: 'idea'
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        compile 'com.google.guava:guava:19.0'
+    }
 }
 
-dependencies {
-  compile 'com.google.guava:guava:19.0'
+project(':idapi') {
 }
