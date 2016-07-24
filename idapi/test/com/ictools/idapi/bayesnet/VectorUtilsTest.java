@@ -59,9 +59,6 @@ public class VectorUtilsTest {
 
     private void checkNormalization(List<Double> vector, List<Double> expected) {
         List<Double> actual = VectorUtils.normalize(vector);
-        assertThat(actual.size(), is(expected.size()));
-        for (int i = 0; i < actual.size(); i++) {
-            assertThat(actual.get(i), is(closeTo(expected.get(i), EPSILON)));
-        }
+        TestUtils.checkVectorEquality(actual, expected);
     }
 }
