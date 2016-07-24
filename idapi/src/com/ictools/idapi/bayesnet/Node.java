@@ -7,7 +7,7 @@ public interface Node {
     public int getDimensionality();
     public List<Double> getPosteriorDistribution();
 
-    public void receiveLambdaMessage(LambdaMessage m);
-    public void receivePiMessage(PiMessage m);
+    public void receiveLambdaMessage(LambdaMessage message);
+    public void receivePiMessage(PiMessage message);
     public void instantiate(int value);
 }
