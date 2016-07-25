@@ -69,15 +69,18 @@ public class RootNode implements Node {
 
     private void propagateEvidenceToChildren(LambdaMessage message) {
         // Now propagate to the other children
-        List<Double> piEvidence = Lists.newArrayList(getPosteriorDistribution());
-        for (int i = 0; i < piEvidence.size(); i++) {
-            if (piEvidence.get(i) != 0.0) {
-                piEvidence.set(i, piEvidence.get(i) / message.getLambdaMessage().get(i));
+        for (Edge childEdge : childEdges) {
+            if (childEdge.getSink().equals(message.getSource())) {
+                continue;
             }
+            List<Double> piEvidence = Lists.newArrayList(getPosteriorDistribution());
+            for (int i = 0; i < piEvidence.size(); i++) {
+                if (piEvidence.get(i) != 0.0 && lambdaMessages.containsKey(childEdge.getSink().getIdentifier())) {
+                    piEvidence.set(i, piEvidence.get(i) / lambdaMessages.get(childEdge.getSink().getIdentifier()).get(i));
+                }
+            }
+            childEdge.propagatePiEvidence(this, piEvidence);
         }
-        childEdges.stream()
-                .filter(childEdge -> !childEdge.getSink().equals(message.getSource()))
-                .forEach(childEdge -> childEdge.propagatePiEvidence(this, piEvidence));
     }
 
     @Override

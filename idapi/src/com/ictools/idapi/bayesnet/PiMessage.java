@@ -4,9 +4,9 @@ import java.util.List;
 
 public class PiMessage {
     private final List<Double> piMessage;
-    private final Node source;
+    private final List<Node> source;
 
-    public PiMessage(List<Double> piMessage, Node source) {
+    public PiMessage(List<Double> piMessage, List<Node> source) {
         this.piMessage = piMessage;
         this.source = source;
     }
@@ -15,7 +15,7 @@ public class PiMessage {
         return piMessage;
     }
 
-    public Node getSource() {
+    public List<Node> getSource() {
         return source;
     }
 }

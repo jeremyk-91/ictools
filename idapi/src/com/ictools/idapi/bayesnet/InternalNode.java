@@ -10,7 +10,7 @@ public class InternalNode implements Node {
     private final String identifier;
     private final int dimensionality;
     private final Map<String, List<Double>> lambdaMessages;
-    private final Map<String, List<Double>> piMessages;
+    private final Map<List<Node>, List<Double>> piMessages;
     private final List<Edge> parentEdges;
     private final List<Edge> childEdges;
 
@@ -91,7 +91,7 @@ public class InternalNode implements Node {
 
     @Override
     public void receivePiMessage(PiMessage message) {
-        piMessages.put(message.getSource().getIdentifier(), message.getPiMessage());
+        piMessages.put(message.getSource(), message.getPiMessage());
         if (!instantiated) {
             // TODO: Recompute the correct pi message for each child (get rid of lambda evidence for each specific child)
             for (Edge childEdge : childEdges) {

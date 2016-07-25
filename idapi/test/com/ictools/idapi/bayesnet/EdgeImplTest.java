@@ -136,4 +136,47 @@ public class EdgeImplTest {
         probMatrix.put(1, Lists.newArrayList(1, 1), 0.9);
         return probMatrix;
     }
+
+    @Test
+    public void testDownPropagation() {
+        List<Edge> edgeList = Lists.newArrayList();
+        Node source = new RootNode("foo", Lists.newArrayList(0.5, 0.5), edgeList);
+        Node sink = new InternalNode("bar", 2, edgeList, Lists.newArrayList());
+
+        Table<Integer, List<Integer>, Double> probMatrix = HashBasedTable.create();
+        probMatrix.put(0, Lists.newArrayList(0), 0.0);
+        probMatrix.put(1, Lists.newArrayList(0), 1.0);
+        probMatrix.put(0, Lists.newArrayList(1), 1.0);
+        probMatrix.put(1, Lists.newArrayList(1), 0.0);
+
+        Edge e = new EdgeImpl(Lists.newArrayList(source), sink, probMatrix);
+        edgeList.add(e);
+
+        source.instantiate(1);
+        List<Double> result = sink.getPosteriorDistribution();
+        TestUtils.checkVectorEquality(result, Lists.newArrayList(1.0, 0.0));
+    }
+
+    @Test
+    public void testDownPropagationTwoChildren() {
+        List<Edge> edgeListSource = Lists.newArrayList();
+        List<Edge> edgeListSink1 = Lists.newArrayList();
+        List<Edge> edgeListSink2 = Lists.newArrayList();
+        Node source = new RootNode("foo", Lists.newArrayList(0.5, 0.5), edgeListSource);
+        Node sink1 = new InternalNode("bar1", 2, edgeListSink1, Lists.newArrayList());
+        Node sink2 = new InternalNode("bar2", 2, edgeListSink2, Lists.newArrayList());
+
+        Table<Integer, List<Integer>, Double> probMatrix = setupOneParentTestMatrix();
+
+        Edge e1 = new EdgeImpl(Lists.newArrayList(source), sink1, probMatrix);
+        Edge e2 = new EdgeImpl(Lists.newArrayList(source), sink2, probMatrix);
+        edgeListSource.add(e1);
+        edgeListSource.add(e2);
+        edgeListSink1.add(e1);
+        edgeListSink2.add(e2);
+
+        sink1.instantiate(1);
+        List<Double> result = sink2.getPosteriorDistribution();
+        TestUtils.checkVectorEquality(result, Lists.newArrayList(2./7, 5./7));
+    }
 }

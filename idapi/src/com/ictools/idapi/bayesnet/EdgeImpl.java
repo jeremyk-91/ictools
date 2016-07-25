@@ -13,11 +13,13 @@ public class EdgeImpl implements Edge {
     private final List<Node> sources;
     private final Node sink;
     private final Table<Integer, List<Integer>, Double> conditionalProbabilityMatrix;
+    private final Map<String, List<Double>> piMessageStore;
 
     public EdgeImpl(List<Node> sources, Node sink, Table<Integer, List<Integer>, Double> conditionalProbabilityMatrix) {
         this.sources = sources;
         this.sink = sink;
         this.conditionalProbabilityMatrix = conditionalProbabilityMatrix;
+        piMessageStore = Maps.newHashMap();
     }
 
     public List<Node> getSources() {
@@ -64,7 +66,26 @@ public class EdgeImpl implements Edge {
 
     @Override
     public void propagatePiEvidence(Node source, List<Double> piEvidence) {
-        // TODO
+        piMessageStore.put(source.getIdentifier(), VectorUtils.normalize(piEvidence));
+
+        List<Double> piMessage = Lists.newArrayList();
+        for (int i = 0; i < sink.getDimensionality(); i++) {
+            piMessage.add(0.0);
+        }
+        for (Table.Cell<Integer, List<Integer>, Double> cell : conditionalProbabilityMatrix.cellSet()) {
+            double jointProbability = 1.0;
+            for (int j = 0; j < cell.getColumnKey().size(); j++) {
+                if (piMessageStore.containsKey(sources.get(j).getIdentifier())) {
+                    List<Double> existingPiMessage = piMessageStore.get(sources.get(j).getIdentifier());
+                    jointProbability *= existingPiMessage.get(cell.getColumnKey().get(j));
+                } else {
+                    jointProbability *= 1. / (sources.get(j).getDimensionality());
+                }
+            }
+            piMessage.set(cell.getRowKey(), piMessage.get(cell.getRowKey()) + jointProbability * cell.getValue());
+        }
+
+        sink.receivePiMessage(new PiMessage(piMessage, sources));
     }
 
     @Override
