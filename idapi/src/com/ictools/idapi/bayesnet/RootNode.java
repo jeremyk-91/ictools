@@ -77,7 +77,7 @@ public class RootNode implements Node {
         }
         childEdges.stream()
                 .filter(childEdge -> !childEdge.getSink().equals(message.getSource()))
-                .forEach(childEdge -> childEdge.propagatePiEvidence(piEvidence));
+                .forEach(childEdge -> childEdge.propagatePiEvidence(this, piEvidence));
     }
 
     @Override
@@ -102,7 +102,7 @@ public class RootNode implements Node {
         List<Double> posterior = getPosteriorDistribution();
 
         for (Edge childEdge : childEdges) {
-            childEdge.propagatePiEvidence(posterior);
+            childEdge.propagatePiEvidence(this, posterior);
         }
     }
 

@@ -40,8 +40,8 @@ public class RootNodeTest {
     public void testPropagatesPiEvidenceOnInstantiation() {
         RootNode rootNode = new RootNode(NAME, Lists.newArrayList(0.4, 0.6), Lists.newArrayList(RANDOM_EDGE_1, RANDOM_EDGE_2));
         rootNode.instantiate(1);
-        verify(RANDOM_EDGE_1, times(1)).propagatePiEvidence(eq(Lists.newArrayList(0.0, 1.0)));
-        verify(RANDOM_EDGE_2, times(1)).propagatePiEvidence(eq(Lists.newArrayList(0.0, 1.0)));
+        verify(RANDOM_EDGE_1, times(1)).propagatePiEvidence(eq(rootNode), eq(Lists.newArrayList(0.0, 1.0)));
+        verify(RANDOM_EDGE_2, times(1)).propagatePiEvidence(eq(rootNode), eq(Lists.newArrayList(0.0, 1.0)));
     }
 
     @Test
@@ -66,9 +66,7 @@ public class RootNodeTest {
         RootNode rootNode = new RootNode(NAME, Lists.newArrayList(0.4, 0.6), Lists.newArrayList());
         rootNode.receiveLambdaMessage(new LambdaMessage(Lists.newArrayList(0.2, 0.8), RANDOM_NODE_1));
         rootNode.receiveLambdaMessage(new LambdaMessage(Lists.newArrayList(0.2, 0.8), RANDOM_NODE_1));
-
-        double totalPreNormalisation = 0.4 * 0.2 + 0.6 * 0.8;
-        TestUtils.checkVectorEquality(rootNode.getPosteriorDistribution(), Lists.newArrayList((0.4 * 0.2) / totalPreNormalisation, (0.6 * 0.8) / totalPreNormalisation));
+        TestUtils.checkVectorEquality(rootNode.getPosteriorDistribution(), Lists.newArrayList(0.08 / 0.56, 0.48 / 0.56));
     }
 
     @Test
@@ -89,15 +87,15 @@ public class RootNodeTest {
     public void testPropagatesPiEvidenceOnReceivingLambdaMessage_1() {
         RootNode rootNode = new RootNode(NAME, Lists.newArrayList(0.4, 0.6), Lists.newArrayList(RANDOM_EDGE_1, RANDOM_EDGE_2));
         rootNode.receiveLambdaMessage(new LambdaMessage(Lists.newArrayList(1.0, 1.0), RANDOM_NODE_1));
-        verify(RANDOM_EDGE_1, never()).propagatePiEvidence(any());
-        verify(RANDOM_EDGE_2, times(1)).propagatePiEvidence(eq(Lists.newArrayList(0.4, 0.6)));
+        verify(RANDOM_EDGE_1, never()).propagatePiEvidence(eq(rootNode), any());
+        verify(RANDOM_EDGE_2, times(1)).propagatePiEvidence(eq(rootNode), eq(Lists.newArrayList(0.4, 0.6)));
     }
 
     @Test
     public void testPropagatesPiEvidenceOnReceivingLambdaMessage_2() {
         RootNode rootNode = new RootNode(NAME, Lists.newArrayList(0.4, 0.6), Lists.newArrayList(RANDOM_EDGE_1, RANDOM_EDGE_2));
         rootNode.receiveLambdaMessage(new LambdaMessage(Lists.newArrayList(0.2, 0.2), RANDOM_NODE_3));
-        verify(RANDOM_EDGE_1, times(1)).propagatePiEvidence(any());
-        verify(RANDOM_EDGE_2, times(1)).propagatePiEvidence(any());
+        verify(RANDOM_EDGE_1, times(1)).propagatePiEvidence(eq(rootNode), any());
+        verify(RANDOM_EDGE_2, times(1)).propagatePiEvidence(eq(rootNode), any());
     }
 }
