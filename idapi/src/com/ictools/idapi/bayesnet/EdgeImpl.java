@@ -7,6 +7,7 @@ import com.google.common.collect.Table;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class EdgeImpl implements Edge {
     private final List<Node> sources;
@@ -88,8 +89,8 @@ public class EdgeImpl implements Edge {
     @Override
     public String toString() {
         return "EdgeImpl{" +
-                "sources=" + sources +
-                ", sink=" + sink +
+                "sources=" + sources.stream().map(Node::getIdentifier).collect(Collectors.toList()) +
+                ", sink=" + sink.getIdentifier() +
                 ", conditionalProbabilityMatrix=" + conditionalProbabilityMatrix +
                 '}';
     }

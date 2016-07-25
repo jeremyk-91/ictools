@@ -35,11 +35,7 @@ public class EdgeImplTest {
         Node source = new RootNode("foo", Lists.newArrayList(0.4, 0.6), edgeList);
         Node sink = new InternalNode("bar", 2, edgeList, Lists.newArrayList());
 
-        Table<Integer, List<Integer>, Double> probMatrix = HashBasedTable.create();
-        probMatrix.put(0, Lists.newArrayList(0), 0.4);
-        probMatrix.put(1, Lists.newArrayList(0), 0.6);
-        probMatrix.put(0, Lists.newArrayList(1), 0.2);
-        probMatrix.put(1, Lists.newArrayList(1), 0.8);
+        Table<Integer, List<Integer>, Double> probMatrix = setupOneParentTestMatrix();
 
         Edge e = new EdgeImpl(Lists.newArrayList(source), sink, probMatrix);
         edgeList.add(e);
@@ -55,11 +51,7 @@ public class EdgeImplTest {
         Node source = new RootNode("foo", Lists.newArrayList(0.4, 0.6), edgeList);
         Node sink = new InternalNode("bar", 2, edgeList, Lists.newArrayList());
 
-        Table<Integer, List<Integer>, Double> probMatrix = HashBasedTable.create();
-        probMatrix.put(0, Lists.newArrayList(0), 0.4);
-        probMatrix.put(1, Lists.newArrayList(0), 0.6);
-        probMatrix.put(0, Lists.newArrayList(1), 0.2);
-        probMatrix.put(1, Lists.newArrayList(1), 0.8);
+        Table<Integer, List<Integer>, Double> probMatrix = setupOneParentTestMatrix();
 
         Edge e = new EdgeImpl(Lists.newArrayList(source), sink, probMatrix);
         edgeList.add(e);
@@ -69,17 +61,22 @@ public class EdgeImplTest {
         TestUtils.checkVectorEquality(result, Lists.newArrayList(0.4, 0.6));
     }
 
+    private Table<Integer, List<Integer>, Double> setupOneParentTestMatrix() {
+        Table<Integer, List<Integer>, Double> probMatrix = HashBasedTable.create();
+        probMatrix.put(0, Lists.newArrayList(0), 0.4);
+        probMatrix.put(1, Lists.newArrayList(0), 0.6);
+        probMatrix.put(0, Lists.newArrayList(1), 0.2);
+        probMatrix.put(1, Lists.newArrayList(1), 0.8);
+        return probMatrix;
+    }
+
     @Test
     public void testVirtualEvidenceForChild() throws Exception {
         List<Edge> edgeList = Lists.newArrayList();
         Node source = new RootNode("foo", Lists.newArrayList(0.4, 0.6), edgeList);
         Node sink = new InternalNode("bar", 2, edgeList, Lists.newArrayList());
 
-        Table<Integer, List<Integer>, Double> probMatrix = HashBasedTable.create();
-        probMatrix.put(0, Lists.newArrayList(0), 0.4);
-        probMatrix.put(1, Lists.newArrayList(0), 0.6);
-        probMatrix.put(0, Lists.newArrayList(1), 0.2);
-        probMatrix.put(1, Lists.newArrayList(1), 0.8);
+        Table<Integer, List<Integer>, Double> probMatrix = setupOneParentTestMatrix();
 
         Edge e = new EdgeImpl(Lists.newArrayList(source), sink, probMatrix);
         edgeList.add(e);
@@ -87,5 +84,56 @@ public class EdgeImplTest {
         sink.receiveLambdaMessage(new LambdaMessage(Lists.newArrayList(0.2, 0.8), sink));
         List<Double> result = source.getPosteriorDistribution();
         TestUtils.checkVectorRatios(result, Lists.newArrayList(0.4 * 56. / (56 + 68), 0.6 * 68. / (56 + 68)));
+    }
+
+    @Test
+    public void testMultipleParents() throws Exception {
+        List<Edge> edgeList = Lists.newArrayList();
+        Node source1 = new RootNode("foo1", Lists.newArrayList(0.1, 0.9), edgeList);
+        Node source2 = new RootNode("foo2", Lists.newArrayList(0.7, 0.3), edgeList);
+        Node sink = new InternalNode("bar", 2, edgeList, Lists.newArrayList());
+
+        Table<Integer, List<Integer>, Double> probMatrix = setupTwoParentTestMatrix();
+
+        Edge e = new EdgeImpl(Lists.newArrayList(source1, source2), sink, probMatrix);
+        edgeList.add(e);
+
+        sink.instantiate(0);
+        List<Double> result1 = source1.getPosteriorDistribution();
+        TestUtils.checkVectorRatios(result1, Lists.newArrayList(0.1 * (0.6), 0.9 * (0.4)));
+        List<Double> result2 = source2.getPosteriorDistribution();
+        TestUtils.checkVectorRatios(result2, Lists.newArrayList(0.7 * (0.7), 0.3 * (0.3)));
+    }
+
+    @Test
+    public void testMultipleParentsVirtualEvidence() throws Exception {
+        List<Edge> edgeList = Lists.newArrayList();
+        Node source1 = new RootNode("foo1", Lists.newArrayList(0.1, 0.9), edgeList);
+        Node source2 = new RootNode("foo2", Lists.newArrayList(0.7, 0.3), edgeList);
+        Node sink = new InternalNode("bar", 2, edgeList, Lists.newArrayList());
+
+        Table<Integer, List<Integer>, Double> probMatrix = setupTwoParentTestMatrix();
+
+        Edge e = new EdgeImpl(Lists.newArrayList(source1, source2), sink, probMatrix);
+        edgeList.add(e);
+
+        sink.receiveLambdaMessage(new LambdaMessage(Lists.newArrayList(0.2, 0.8), sink));
+        List<Double> result1 = source1.getPosteriorDistribution();
+        TestUtils.checkVectorRatios(result1, Lists.newArrayList(0.1 * (1.24 / 2.6), 0.9 * (1.36 / 2.6)));
+        List<Double> result2 = source2.getPosteriorDistribution();
+        TestUtils.checkVectorRatios(result2, Lists.newArrayList(0.7 * (1.18 / 2.6), 0.3 * (1.42 / 2.6)));
+    }
+
+    private Table<Integer, List<Integer>, Double> setupTwoParentTestMatrix() {
+        Table<Integer, List<Integer>, Double> probMatrix = HashBasedTable.create();
+        probMatrix.put(0, Lists.newArrayList(0, 0), 0.4);
+        probMatrix.put(1, Lists.newArrayList(0, 0), 0.6);
+        probMatrix.put(0, Lists.newArrayList(0, 1), 0.2);
+        probMatrix.put(1, Lists.newArrayList(0, 1), 0.8);
+        probMatrix.put(0, Lists.newArrayList(1, 0), 0.3);
+        probMatrix.put(1, Lists.newArrayList(1, 0), 0.7);
+        probMatrix.put(0, Lists.newArrayList(1, 1), 0.1);
+        probMatrix.put(1, Lists.newArrayList(1, 1), 0.9);
+        return probMatrix;
     }
 }
