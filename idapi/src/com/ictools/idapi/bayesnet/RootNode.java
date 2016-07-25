@@ -43,6 +43,11 @@ public class RootNode implements Node {
         if (underlyingMessage.size() != getDimensionality()) {
             throw new IllegalArgumentException("Node " + this + " does not expect a lambda message " + message + "; wrong dimensionality");
         }
+        recomputePosterior(underlyingMessage);
+        propagateEvidenceToChildren(message, underlyingMessage);
+    }
+
+    private void recomputePosterior(List<Double> underlyingMessage) {
         // Otherwise, update the lambda evidence
         List<Double> newPosterior = Lists.newArrayList();
         for (int i = 0; i < posterior.size(); i++) {
@@ -53,7 +58,9 @@ public class RootNode implements Node {
         for (int i = 0; i < this.posterior.size(); i++) {
             this.posterior.set(i, posterior.get(i));
         }
+    }
 
+    private void propagateEvidenceToChildren(LambdaMessage message, List<Double> underlyingMessage) {
         // Now propagate to the other children
         List<Double> piEvidence = Lists.newArrayList(posterior);
         for (int i = 0; i < posterior.size(); i++) {
@@ -63,7 +70,7 @@ public class RootNode implements Node {
         }
         childEdges.stream()
                 .filter(childEdge -> !childEdge.getSink().equals(message.getSource()))
-                .forEach(childEdge -> childEdge.propagatePiMessage(piEvidence));
+                .forEach(childEdge -> childEdge.propagatePiEvidence(piEvidence));
     }
 
     @Override
@@ -85,7 +92,7 @@ public class RootNode implements Node {
         }
 
         for (Edge childEdge : childEdges) {
-            childEdge.propagatePiMessage(posterior); // A bit hacky, but they are the same.
+            childEdge.propagatePiEvidence(posterior); // A bit hacky, but they are the same.
         }
     }
 

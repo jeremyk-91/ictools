@@ -15,4 +15,8 @@ public class TestUtils {
             assertThat(v1.get(i), is(closeTo(v2.get(i), EPSILON)));
         }
     }
+
+    public static void checkVectorRatios(List<Double> v1, List<Double> v2) {
+        checkVectorEquality(VectorUtils.normalize(v1), VectorUtils.normalize(v2));
+    }
 }

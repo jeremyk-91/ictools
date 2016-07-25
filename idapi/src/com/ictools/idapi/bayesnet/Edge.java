@@ -5,6 +5,6 @@ import java.util.List;
 public interface Edge {
     public Node getSource();
     public Node getSink();
-    public void propagateLambdaMessage(List<Double> lambdaEvidence);
-    public void propagatePiMessage(List<Double> piEvidence);
+    public void propagateLambdaEvidence(List<Double> lambdaEvidence);
+    public void propagatePiEvidence(List<Double> piEvidence);
 }

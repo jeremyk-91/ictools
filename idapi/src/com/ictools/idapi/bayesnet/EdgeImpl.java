@@ -28,12 +28,12 @@ public class EdgeImpl implements Edge {
     }
 
     @Override
-    public void propagateLambdaMessage(List<Double> lambdaEvidence) {
+    public void propagateLambdaEvidence(List<Double> lambdaEvidence) {
         // TODO
     }
 
     @Override
-    public void propagatePiMessage(List<Double> piEvidence) {
+    public void propagatePiEvidence(List<Double> piEvidence) {
         // TODO
     }
 
