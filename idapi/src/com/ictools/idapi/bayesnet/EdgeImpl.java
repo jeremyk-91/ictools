@@ -57,7 +57,16 @@ public class EdgeImpl implements Edge {
                 }
                 for (Map.Entry<List<Integer>, Double> entry : jointLambdaMessage.entrySet()) {
                     int valueForSpecificSource = entry.getKey().get(i);
-                    specificLambdaMessage.set(valueForSpecificSource, specificLambdaMessage.get(valueForSpecificSource) + entry.getValue());
+                    double marginalValue = entry.getValue();
+                    for (int k = 0; k < entry.getKey().size(); k++) {
+                        if (k != i) {
+                            if (piMessageStore.containsKey(sources.get(k).getIdentifier())) {
+                                List<Double> existingPiMessage = piMessageStore.get(sources.get(k).getIdentifier());
+                                marginalValue *= existingPiMessage.get(entry.getKey().get(k));
+                            }
+                        }
+                    }
+                    specificLambdaMessage.set(valueForSpecificSource, specificLambdaMessage.get(valueForSpecificSource) + marginalValue);
                 }
                 sources.get(i).receiveLambdaMessage(new LambdaMessage(specificLambdaMessage, source));
             }
@@ -85,7 +94,7 @@ public class EdgeImpl implements Edge {
             piMessage.set(cell.getRowKey(), piMessage.get(cell.getRowKey()) + jointProbability * cell.getValue());
         }
 
-        sink.receivePiMessage(new PiMessage(piMessage, sources));
+        sink.receivePiMessage(new PiMessage(piMessage, sources, source));
     }
 
     @Override

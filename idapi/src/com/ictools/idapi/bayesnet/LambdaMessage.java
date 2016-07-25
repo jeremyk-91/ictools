@@ -6,6 +6,14 @@ public class LambdaMessage {
     private final List<Double> lambdaMessage;
     private final Node source;
 
+    @Override
+    public String toString() {
+        return "LambdaMessage{" +
+                "lambdaMessage=" + lambdaMessage +
+                ", source=" + source +
+                '}';
+    }
+
     public LambdaMessage(List<Double> lambdaMessage, Node source) {
         this.lambdaMessage = lambdaMessage;
         this.source = source;

@@ -85,8 +85,9 @@ public class RootNode implements Node {
 
     @Override
     public void receivePiMessage(PiMessage message) {
-        // Should not be possible
-        throw new IllegalStateException("A root node should not receive pi messages, by definition!");
+        // This means initialisation, with the established prior.
+        // Note that the message is ignored.
+        propagatePiEvidenceToChildren();
     }
 
     @Override

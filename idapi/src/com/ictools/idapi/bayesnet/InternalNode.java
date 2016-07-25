@@ -83,7 +83,7 @@ public class InternalNode implements Node {
             }
         }
 
-        parentEdges.stream().forEach(edge -> edge.propagateLambdaEvidence(this, lambdaEvidence));
+        parentEdges.stream().forEach(edge -> edge.propagateLambdaEvidenceSelective(this, lambdaEvidence, this));
         childEdges.stream()
                 .filter(childEdge -> !childEdge.getSink().equals(message.getSource()))
                 .forEach(childEdge -> childEdge.propagatePiEvidence(this, piEvidence));
@@ -98,7 +98,7 @@ public class InternalNode implements Node {
                 List<Double> piEvidence = Lists.newArrayList(getPosteriorDistribution());
                 List<Double> lambdaEvidenceFromChild = lambdaMessages.get(childEdge.getSink().getIdentifier());
                 for (int i = 0; i < piEvidence.size(); i++) {
-                    if (piEvidence.get(i) != 0.0) {
+                    if (piEvidence.get(i) != 0.0 && lambdaEvidenceFromChild != null) {
                         piEvidence.set(i, piEvidence.get(i) / lambdaEvidenceFromChild.get(i));
                     }
                 }
@@ -110,12 +110,13 @@ public class InternalNode implements Node {
         if (hasLambdaEvidence()) {
             // Talk to the other parents too
             List<Double> lambdaEvidence = getLambdaEvidence();
-            parentEdges.stream().forEach(edge -> edge.propagateLambdaEvidence(this, lambdaEvidence));
+            parentEdges.stream()
+                .forEach(edge -> edge.propagateLambdaEvidenceSelective(this, lambdaEvidence, message.getIndividualSource()));
         }
     }
 
     private boolean hasLambdaEvidence() {
-        return lambdaMessages.values().stream().anyMatch(list -> list.stream().anyMatch(d -> d != 1.0));
+        return !lambdaMessages.isEmpty();
     }
 
     @Override
