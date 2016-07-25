@@ -11,4 +11,8 @@ public interface Node {
     public void receivePiMessage(PiMessage message);
     public void instantiate(int value);
     public boolean isInstantiated();
+
+    // package private
+    public List<Edge> getParentEdges();
+    public List<Edge> getChildEdges();
 }

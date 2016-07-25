@@ -138,6 +138,16 @@ public class InternalNode implements Node {
     }
 
     @Override
+    public List<Edge> getParentEdges() {
+        return parentEdges;
+    }
+
+    @Override
+    public List<Edge> getChildEdges() {
+        return childEdges;
+    }
+
+    @Override
     public String toString() {
         return "InternalNode{" +
                 "identifier='" + identifier + '\'' +

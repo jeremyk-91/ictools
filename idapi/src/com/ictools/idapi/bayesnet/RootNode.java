@@ -107,6 +107,16 @@ public class RootNode implements Node {
         return instantiated;
     }
 
+    @Override
+    public List<Edge> getParentEdges() {
+        return Lists.newArrayList();
+    }
+
+    @Override
+    public List<Edge> getChildEdges() {
+        return childEdges;
+    }
+
     private void propagatePiEvidenceToChildren() {
         List<Double> posterior = getPosteriorDistribution();
 
