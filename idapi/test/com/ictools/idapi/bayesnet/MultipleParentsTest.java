@@ -8,6 +8,8 @@ import org.junit.Test;
 import java.util.List;
 
 import static junit.framework.TestCase.fail;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 
 public class MultipleParentsTest {
     @Test
@@ -91,6 +93,14 @@ public class MultipleParentsTest {
         } catch (IllegalStateException e) {
             // Expected
         }
+
+        List<MessageAction> messageActions = ((InternalNode) nodeE).explainUnsafeInstantiation();
+        assertThat(messageActions.size(), is(5));
+        assertThat(messageActions.get(0), is(new MessageAction(nodeE, nodeD, MessageType.LAMBDA)));
+        assertThat(messageActions.get(1), is(new MessageAction(nodeD, nodeB, MessageType.LAMBDA)));
+        assertThat(messageActions.get(2), is(new MessageAction(nodeB, nodeA, MessageType.LAMBDA)));
+        assertThat(messageActions.get(3), is(new MessageAction(nodeA, nodeC, MessageType.PI)));
+        assertThat(messageActions.get(4), is(new MessageAction(nodeC, nodeD, MessageType.PI)));
 
         // PART 1(d)
         nodeC.instantiate(1);

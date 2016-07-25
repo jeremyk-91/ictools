@@ -2,8 +2,6 @@ package com.ictools.idapi.bayesnet;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import javafx.util.Pair;
 
 import java.util.*;
 
@@ -125,20 +123,25 @@ public class InternalNode implements Node {
         if (instantiated) {
             return false;
         }
-
-        // O(n). We need to keep the ordering though
-        List<Node> active = Lists.newArrayList();
-        List<Node> visited = Lists.newArrayList();
-
         try {
-            checkInstantiationSafety(this, active, visited, null, null);
+            simulateMessage(this, Lists.newArrayList(), Lists.newArrayList(), null, null, Lists.newArrayList());
             return true;
         } catch (IllegalStateException e) {
             return false;
         }
     }
 
-    private void checkInstantiationSafety(Node node, List<Node> active, List<Node> visited, MessageType messageType, Node messageSource) {
+    public List<MessageAction> explainUnsafeInstantiation() {
+        List<MessageAction> messageActions = Lists.newArrayList();
+        try {
+            simulateMessage(this, Lists.newArrayList(), Lists.newArrayList(), null, null, messageActions);
+        } catch (IllegalStateException e) {
+            // Complete the cycle.
+        }
+        return messageActions;
+    }
+
+    private void simulateMessage(Node node, List<Node> active, List<Node> visited, MessageType messageType, Node messageSource, List<MessageAction> actions) {
         if (active.contains(node)) {
             throw new IllegalStateException("Loop!");
         }
@@ -149,11 +152,15 @@ public class InternalNode implements Node {
                 // Send to all
                 for (Edge edge : node.getParentEdges()) {
                     for (Node parent : edge.getSources()) {
-                        checkInstantiationSafety(parent, active, visited, MessageType.LAMBDA, node);
+                        actions.add(new MessageAction(node, parent, MessageType.LAMBDA));
+                        simulateMessage(parent, active, visited, MessageType.LAMBDA, node, actions);
+                        actions.remove(actions.size() - 1);
                     }
                 }
                 for (Edge edge : node.getChildEdges()) {
-                    checkInstantiationSafety(edge.getSink(), active, visited, MessageType.PI, node);
+                    actions.add(new MessageAction(node, edge.getSink(), MessageType.PI));
+                    simulateMessage(edge.getSink(), active, visited, MessageType.PI, node, actions);
+                    actions.remove(actions.size() - 1);
                 }
             } else if (messageType == MessageType.LAMBDA) {
                 if (!node.isInstantiated()) {
@@ -161,12 +168,16 @@ public class InternalNode implements Node {
                     // Lambda to ALL parents
                     for (Edge edge : node.getParentEdges()) {
                         for (Node parent : edge.getSources()) {
-                            checkInstantiationSafety(parent, active, visited, MessageType.LAMBDA, node);
+                            actions.add(new MessageAction(node, parent, MessageType.LAMBDA));
+                            simulateMessage(parent, active, visited, MessageType.LAMBDA, node, actions);
+                            actions.remove(actions.size() - 1);
                         }
                     }
                     for (Edge edge : node.getChildEdges()) {
                         if (!edge.getSink().equals(messageSource)) {
-                            checkInstantiationSafety(edge.getSink(), active, visited, MessageType.PI, node);
+                            actions.add(new MessageAction(node, edge.getSink(), MessageType.PI));
+                            simulateMessage(edge.getSink(), active, visited, MessageType.PI, node, actions);
+                            actions.remove(actions.size() - 1);
                         }
                     }
                 }
@@ -175,7 +186,9 @@ public class InternalNode implements Node {
                 if (!node.isInstantiated()) {
                     // Pi to ALL children
                     for (Edge edge : node.getChildEdges()) {
-                        checkInstantiationSafety(edge.getSink(), active, visited, MessageType.PI, node);
+                        actions.add(new MessageAction(node, edge.getSink(), MessageType.PI));
+                        simulateMessage(edge.getSink(), active, visited, MessageType.PI, node, actions);
+                        actions.remove(actions.size() - 1);
                     }
                 }
                 if (node.hasLambdaEvidence()) {
@@ -183,7 +196,9 @@ public class InternalNode implements Node {
                     for (Edge edge : node.getParentEdges()) {
                         for (Node parent : edge.getSources()) {
                             if (!parent.equals(messageSource)) {
-                                checkInstantiationSafety(parent, active, visited, MessageType.LAMBDA, node);
+                                actions.add(new MessageAction(node, parent, MessageType.LAMBDA));
+                                simulateMessage(parent, active, visited, MessageType.LAMBDA, node, actions);
+                                actions.remove(actions.size() - 1);
                             }
                         }
                     }
@@ -191,10 +206,6 @@ public class InternalNode implements Node {
             }
             active.remove(node);
         }
-    }
-
-    private static enum MessageType {
-        LAMBDA, PI
     }
 
     @Override
