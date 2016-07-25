@@ -23,7 +23,8 @@ public class RootNodeTest {
 
     @Before
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
+        when(RANDOM_NODE_1.getIdentifier()).thenReturn(("1"));
+        when(RANDOM_NODE_2.getIdentifier()).thenReturn(("2"));
         when(RANDOM_EDGE_1.getSink()).thenReturn(RANDOM_NODE_1);
         when(RANDOM_EDGE_2.getSink()).thenReturn(RANDOM_NODE_2);
     }
@@ -51,13 +52,23 @@ public class RootNodeTest {
     }
 
     @Test
-    public void testReceiveMultipleLambdaMessages() {
+    public void testReceiveMultipleLambdaMessages_DifferentNodes() {
+        RootNode rootNode = new RootNode(NAME, Lists.newArrayList(0.4, 0.6), Lists.newArrayList());
+        rootNode.receiveLambdaMessage(new LambdaMessage(Lists.newArrayList(0.2, 0.8), RANDOM_NODE_1));
+        rootNode.receiveLambdaMessage(new LambdaMessage(Lists.newArrayList(0.2, 0.8), RANDOM_NODE_2));
+
+        double totalPreNormalisation = 0.4 * 0.2 * 0.2 + 0.6 * 0.8 * 0.8;
+        TestUtils.checkVectorEquality(rootNode.getPosteriorDistribution(), Lists.newArrayList((0.4 * 0.2 * 0.2) / totalPreNormalisation, (0.6 * 0.8 * 0.8) / totalPreNormalisation));
+    }
+
+    @Test
+    public void testReceiveMultipleLambdaMessages_SameNode() {
         RootNode rootNode = new RootNode(NAME, Lists.newArrayList(0.4, 0.6), Lists.newArrayList());
         rootNode.receiveLambdaMessage(new LambdaMessage(Lists.newArrayList(0.2, 0.8), RANDOM_NODE_1));
         rootNode.receiveLambdaMessage(new LambdaMessage(Lists.newArrayList(0.2, 0.8), RANDOM_NODE_1));
 
-        double totalPreNormalisation = 0.4 * 0.2 * 0.2 + 0.6 * 0.8 * 0.8;
-        TestUtils.checkVectorEquality(rootNode.getPosteriorDistribution(), Lists.newArrayList((0.4 * 0.2 * 0.2) / totalPreNormalisation, (0.6 * 0.8 * 0.8) / totalPreNormalisation));
+        double totalPreNormalisation = 0.4 * 0.2 + 0.6 * 0.8;
+        TestUtils.checkVectorEquality(rootNode.getPosteriorDistribution(), Lists.newArrayList((0.4 * 0.2) / totalPreNormalisation, (0.6 * 0.8) / totalPreNormalisation));
     }
 
     @Test
