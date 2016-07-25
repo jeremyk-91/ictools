@@ -2,9 +2,10 @@ package com.ictools.idapi.bayesnet;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import javafx.util.Pair;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class InternalNode implements Node {
     private final String identifier;
@@ -115,8 +116,85 @@ public class InternalNode implements Node {
         }
     }
 
-    private boolean hasLambdaEvidence() {
+    @Override
+    public boolean hasLambdaEvidence() {
         return !lambdaMessages.isEmpty();
+    }
+
+    private boolean checkInstantiationSafety() {
+        if (instantiated) {
+            return false;
+        }
+
+        // O(n). We need to keep the ordering though
+        List<Node> active = Lists.newArrayList();
+        List<Node> visited = Lists.newArrayList();
+
+        try {
+            checkInstantiationSafety(this, active, visited, null, null);
+            return true;
+        } catch (IllegalStateException e) {
+            return false;
+        }
+    }
+
+    private void checkInstantiationSafety(Node node, List<Node> active, List<Node> visited, MessageType messageType, Node messageSource) {
+        if (active.contains(node)) {
+            throw new IllegalStateException("Loop!");
+        }
+        if (!visited.contains(node)) {
+            active.add(node);
+            visited.add(node);
+            if (messageType == null) {
+                // Send to all
+                for (Edge edge : node.getParentEdges()) {
+                    for (Node parent : edge.getSources()) {
+                        checkInstantiationSafety(parent, active, visited, MessageType.LAMBDA, node);
+                    }
+                }
+                for (Edge edge : node.getChildEdges()) {
+                    checkInstantiationSafety(edge.getSink(), active, visited, MessageType.PI, node);
+                }
+            } else if (messageType == MessageType.LAMBDA) {
+                if (!node.isInstantiated()) {
+                    // Pi to ALL other children
+                    // Lambda to ALL parents
+                    for (Edge edge : node.getParentEdges()) {
+                        for (Node parent : edge.getSources()) {
+                            checkInstantiationSafety(parent, active, visited, MessageType.LAMBDA, node);
+                        }
+                    }
+                    for (Edge edge : node.getChildEdges()) {
+                        if (!edge.getSink().equals(messageSource)) {
+                            checkInstantiationSafety(edge.getSink(), active, visited, MessageType.PI, node);
+                        }
+                    }
+                }
+            } else {
+                // PI message
+                if (!node.isInstantiated()) {
+                    // Pi to ALL children
+                    for (Edge edge : node.getChildEdges()) {
+                        checkInstantiationSafety(edge.getSink(), active, visited, MessageType.PI, node);
+                    }
+                }
+                if (node.hasLambdaEvidence()) {
+                    // Lambda to other parents
+                    for (Edge edge : node.getParentEdges()) {
+                        for (Node parent : edge.getSources()) {
+                            if (!parent.equals(messageSource)) {
+                                checkInstantiationSafety(parent, active, visited, MessageType.LAMBDA, node);
+                            }
+                        }
+                    }
+                }
+            }
+            active.remove(node);
+        }
+    }
+
+    private static enum MessageType {
+        LAMBDA, PI
     }
 
     @Override
@@ -124,10 +202,14 @@ public class InternalNode implements Node {
         if (instantiated) {
             throw new IllegalStateException("Cannot instantiate a node twice.");
         }
+        if (!checkInstantiationSafety()) {
+            throw new IllegalStateException("It's not safe to instantiate this node at this time, because it will cause endless propagation.");
+        }
         instantiated = true;
         instantiatedValue = value;
 
         List<Double> posterior = getPosteriorDistribution(); // This is both Lambda and Pi, because of the pearl equations
+        lambdaMessages.put(identifier, posterior);
         parentEdges.stream().forEach(edge -> edge.propagateLambdaEvidence(this, posterior));
         childEdges.stream().forEach(edge -> edge.propagatePiEvidence(this, posterior));
     }

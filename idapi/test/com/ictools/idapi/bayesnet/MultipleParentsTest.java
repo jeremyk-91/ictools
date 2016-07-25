@@ -7,6 +7,8 @@ import org.junit.Test;
 
 import java.util.List;
 
+import static junit.framework.TestCase.fail;
+
 public class MultipleParentsTest {
     @Test
     public void testHandlesMultipleParents() throws Exception {
@@ -81,6 +83,14 @@ public class MultipleParentsTest {
         TestUtils.checkVectorEquality(nodeC.getPosteriorDistribution(), Lists.newArrayList(0.42, 0.58));
         TestUtils.checkVectorEquality(nodeD.getPosteriorDistribution(), Lists.newArrayList(0.2992, 0.7008));
         TestUtils.checkVectorEquality(nodeE.getPosteriorDistribution(), Lists.newArrayList(0.50944, 0.49056));
+
+        // PART 1(c)
+        try {
+            nodeE.instantiate(0);
+            fail();
+        } catch (IllegalStateException e) {
+            // Expected
+        }
 
         // PART 1(d)
         nodeC.instantiate(1);

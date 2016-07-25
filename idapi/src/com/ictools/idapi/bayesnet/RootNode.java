@@ -99,12 +99,18 @@ public class RootNode implements Node {
         }
         instantiated = true;
         instantiatedValue = value;
+        lambdaMessages.put(identifier, getPosteriorDistribution());
         propagatePiEvidenceToChildren();
     }
 
     @Override
     public boolean isInstantiated() {
         return instantiated;
+    }
+
+    @Override
+    public boolean hasLambdaEvidence() {
+        return !lambdaMessages.isEmpty();
     }
 
     @Override
