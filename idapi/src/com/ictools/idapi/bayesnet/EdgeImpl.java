@@ -34,30 +34,11 @@ public class EdgeImpl implements Edge {
 
     @Override
     public void propagateLambdaEvidence(Node source, List<Double> lambdaEvidence) {
-        Map<List<Integer>, Double> jointLambdaMessage = Maps.newHashMap();
-        for (int i = 0; i < lambdaEvidence.size(); i++) {
-            Map<List<Integer>, Double> row = conditionalProbabilityMatrix.row(i);
-            for (Map.Entry<List<Integer>, Double> entry : row.entrySet()) {
-                jointLambdaMessage.put(entry.getKey(), lambdaEvidence.get(i) * entry.getValue() + jointLambdaMessage.getOrDefault(entry.getKey(), 0.0));
-            }
-        }
-        // Now for each source
-        for (int i = 0; i < sources.size(); i++) {
-            List<Double> specificLambdaMessage = Lists.newArrayList();
-            for (int j = 0; j < sources.get(i).getDimensionality(); j++) {
-                specificLambdaMessage.add(0.0);
-            }
-            for (Map.Entry<List<Integer>, Double> entry : jointLambdaMessage.entrySet()) {
-                int valueForSpecificSource = entry.getKey().get(i);
-                specificLambdaMessage.set(valueForSpecificSource, specificLambdaMessage.get(valueForSpecificSource) + entry.getValue());
-            }
-            sources.get(i).receiveLambdaMessage(new LambdaMessage(specificLambdaMessage, source));
-        }
+        propagateLambdaEvidenceSelective(source, lambdaEvidence, null);
     }
 
     @Override
     public void propagateLambdaEvidenceSelective(Node source, List<Double> lambdaEvidence, Node blockedParent) {
-        // TODO Refactor the above
         Map<List<Integer>, Double> jointLambdaMessage = Maps.newHashMap();
         for (int i = 0; i < lambdaEvidence.size(); i++) {
             Map<List<Integer>, Double> row = conditionalProbabilityMatrix.row(i);
