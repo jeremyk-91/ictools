@@ -133,6 +133,11 @@ public class InternalNode implements Node {
     }
 
     @Override
+    public boolean isInstantiated() {
+        return instantiated;
+    }
+
+    @Override
     public String toString() {
         return "InternalNode{" +
                 "identifier='" + identifier + '\'' +

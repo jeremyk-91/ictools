@@ -6,7 +6,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class VectorUtils {
+public final class VectorUtils {
+
+    private VectorUtils() {
+        // Don't think of instantiating me. At all.
+    }
+
     public static List<Double> normalize(List<Double> vector) {
         double sum = vector.stream().mapToDouble(Math::abs).sum();
         if (sum == 0.0) {

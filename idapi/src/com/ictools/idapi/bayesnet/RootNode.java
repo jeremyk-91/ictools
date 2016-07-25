@@ -102,6 +102,11 @@ public class RootNode implements Node {
         propagatePiEvidenceToChildren();
     }
 
+    @Override
+    public boolean isInstantiated() {
+        return instantiated;
+    }
+
     private void propagatePiEvidenceToChildren() {
         List<Double> posterior = getPosteriorDistribution();
 

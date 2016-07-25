@@ -10,4 +10,5 @@ public interface Node {
     public void receiveLambdaMessage(LambdaMessage message);
     public void receivePiMessage(PiMessage message);
     public void instantiate(int value);
+    public boolean isInstantiated();
 }
