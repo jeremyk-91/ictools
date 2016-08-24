@@ -1,9 +1,13 @@
 package com.ictools.algorithms.graph.structures;
 
 import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
+import javafx.util.Pair;
 
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class TableGraph implements WeightedGraph {
 
@@ -26,6 +30,19 @@ public class TableGraph implements WeightedGraph {
     @Override
     public boolean isConnected(long a, long b) {
         return graph.contains(a, b);
+    }
+
+    @Override
+    public Set<Long> getNodes() {
+        // TODO Implement caching so the expensive set union gets amortised
+        Set<Long> outgoingNodes = Sets.newHashSet(graph.columnKeySet());
+        outgoingNodes.addAll(graph.rowKeySet());
+        return outgoingNodes;
+    }
+
+    @Override
+    public Set<Pair<Long, Long>> getEdges() {
+        return graph.cellSet().stream().map(x -> new Pair<>(x.getRowKey(), x.getColumnKey())).collect(Collectors.toSet());
     }
 
     @Override
