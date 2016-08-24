@@ -1,11 +1,6 @@
 package com.ictools.algorithms.graph.maxflow;
 
-import com.ictools.algorithms.graph.structures.Graph;
-import com.ictools.algorithms.graph.structures.TableGraph;
 import com.ictools.algorithms.graph.structures.WeightedGraph;
-
-import java.util.Optional;
-import java.util.Set;
 
 public class FlowNetwork {
     private final WeightedGraph graph;
