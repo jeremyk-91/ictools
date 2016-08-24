@@ -1,5 +1,6 @@
 package com.ictools.algorithms.graph.maxflow;
 
+import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 
 public class MaxFlowResult {
@@ -7,7 +8,7 @@ public class MaxFlowResult {
     private final long maximumFlowValue;
 
     public MaxFlowResult(Table<Long, Long, Long> maximumFlow, long maximumFlowValue) {
-        this.maximumFlow = maximumFlow;
+        this.maximumFlow = HashBasedTable.create(maximumFlow);
         this.maximumFlowValue = maximumFlowValue;
     }
 
@@ -27,7 +28,7 @@ public class MaxFlowResult {
         MaxFlowResult that = (MaxFlowResult) o;
 
         if (maximumFlowValue != that.maximumFlowValue) return false;
-        if (maximumFlow != null ? !maximumFlow.equals(that.maximumFlow) : that.maximumFlow != null) return false;
+        if (!maximumFlow.equals(that.maximumFlow)) return false;
 
         return true;
     }

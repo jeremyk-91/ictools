@@ -14,6 +14,10 @@ public class FlowNetwork {
         this.sink = sink;
     }
 
+    public WeightedGraph getGraph() {
+        return graph;
+    }
+
     private void graphSanityCheck(WeightedGraph graph) {
         if (graph.getEdges().stream().anyMatch(edge -> graph.getWeight(edge.getKey(), edge.getValue()).get() < 0)) {
             throw new IllegalArgumentException("This library assumes that capacities in a flow network must be nonnegative.");
