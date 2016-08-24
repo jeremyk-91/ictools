@@ -21,6 +21,35 @@ public class DefaultingTable<R, C, V> implements Table<R, C, V> {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        DefaultingTable that = (DefaultingTable) o;
+
+        if (defaultValue != null ? !defaultValue.equals(that.defaultValue) : that.defaultValue != null) return false;
+        if (delegate != null ? !delegate.equals(that.delegate) : that.delegate != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = delegate != null ? delegate.hashCode() : 0;
+        result = 31 * result + (defaultValue != null ? defaultValue.hashCode() : 0);
+        return result;
+    }
+
+    @Override
+
+    public String toString() {
+        return "DefaultingTable{" +
+                "delegate=" + delegate +
+                ", defaultValue=" + defaultValue +
+                '}';
+    }
+
+    @Override
     public boolean contains(Object rowKey, Object columnKey) {
         return delegate.contains(rowKey, columnKey);
     }
