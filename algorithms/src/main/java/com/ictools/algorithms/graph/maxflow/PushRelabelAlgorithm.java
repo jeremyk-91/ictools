@@ -2,18 +2,26 @@ package com.ictools.algorithms.graph.maxflow;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Table;
 import com.ictools.algorithms.graph.structures.DefaultingTable;
 import com.ictools.algorithms.graph.structures.WeightedGraph;
 import javafx.util.Pair;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Push-relabel algorithms are a (generally) more efficient class of algorithms for
+ * finding maximum flows in a graph, as opposed to the Ford-Fulkerson method.
+ *
+ * The FIFO selection rule used here gives this algorithm an O(V^3) complexity.
+ * (Goldberg and Tarjan 1986). There are other tactics that can be used to push this
+ * even further down using dynamic trees.
+ *
+ * (Compare with Edmonds-Karp, which is O(VE^2) so possibly O(V^5) in a dense graph.)
+ */
 public class PushRelabelAlgorithm implements MaxFlowAlgorithm {
 
     private final FlowNetwork flowNetwork;
