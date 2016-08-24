@@ -5,5 +5,4 @@
 # Modules Supported
 
 - C220 Software Engineering Algorithms
-  - Levenshtein Distance
   - Ford-Fulkerson (implemented via Edmonds-Karp)
