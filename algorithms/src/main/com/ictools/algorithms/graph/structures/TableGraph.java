@@ -1,4 +1,4 @@
-package com.ictools.algorithms.graph;
+package com.ictools.algorithms.graph.structures;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
@@ -26,5 +26,29 @@ public class TableGraph implements WeightedGraph {
     @Override
     public boolean isConnected(long a, long b) {
         return graph.contains(a, b);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        TableGraph that = (TableGraph) o;
+
+        if (graph != null ? !graph.equals(that.graph) : that.graph != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return graph != null ? graph.hashCode() : 0;
+    }
+
+    @Override
+    public String toString() {
+        return "TableGraph{" +
+                "graph=" + graph +
+                '}';
     }
 }

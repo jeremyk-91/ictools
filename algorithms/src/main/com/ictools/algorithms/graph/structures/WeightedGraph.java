@@ -1,4 +1,4 @@
-package com.ictools.algorithms.graph;
+package com.ictools.algorithms.graph.structures;
 
 import java.util.Optional;
 

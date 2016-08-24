@@ -1,4 +1,4 @@
-package com.ictools.algorithms.graph;
+package com.ictools.algorithms.graph.structures;
 
 public interface Graph {
     // Returns true if there is an edge from a to b.
