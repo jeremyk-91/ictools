@@ -11,3 +11,7 @@ allprojects {
 
 project(':idapi') {
 }
+
+
+project(':algorithms') {
+}
