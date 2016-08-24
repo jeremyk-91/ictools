@@ -24,8 +24,8 @@ public class EdmondsKarpAlgorithm implements MaxFlowAlgorithm {
 
     public EdmondsKarpAlgorithm(FlowNetwork flowNetwork) {
         this.flowNetwork = flowNetwork;
-        this.residualGraph = new DefaultingTable<>(HashBasedTable.<Long, Long, Long>create(), 0l);
-        this.flow = new DefaultingTable<>(HashBasedTable.<Long, Long, Long>create(), 0l);
+        this.residualGraph = new DefaultingTable<>(HashBasedTable.create(), 0l);
+        this.flow = new DefaultingTable<>(HashBasedTable.create(), 0l);
         this.flowValue = 0l;
     }
 
@@ -66,7 +66,7 @@ public class EdmondsKarpAlgorithm implements MaxFlowAlgorithm {
             residualGraph.remove(edge.getKey(), edge.getValue());
         }
         residualGraph.put(edge.getValue(), edge.getKey(),
-                residualGraph.get(edge.getValue(), edge.getKey() + minCapacity));
+                residualGraph.get(edge.getValue(), edge.getKey()) + minCapacity);
         flow.put(edge.getKey(), edge.getValue(),
                 flow.get(edge.getKey(), edge.getValue()) + minCapacity);
     }
