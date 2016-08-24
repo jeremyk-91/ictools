@@ -13,10 +13,6 @@ public class TableGraph implements WeightedGraph {
 
     private final Table<Long, Long, Long> graph;
 
-    public TableGraph() {
-        this(HashBasedTable.create());
-    }
-
     public TableGraph(Table<Long, Long, Long> graph) {
         this.graph = graph;
     }
@@ -28,7 +24,7 @@ public class TableGraph implements WeightedGraph {
     }
 
     @Override
-    public boolean isConnected(long a, long b) {
+    public boolean isAdjacent(long a, long b) {
         return graph.contains(a, b);
     }
 
