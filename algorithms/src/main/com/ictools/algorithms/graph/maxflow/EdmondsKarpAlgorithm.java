@@ -7,13 +7,11 @@ import com.ictools.algorithms.graph.structures.WeightedGraph;
 import javafx.util.Pair;
 
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
  * This class implements a specific case of the Ford-Fulkerson algorithm.
  * To select an augmenting path, the algorithm selects the shortest path (as measured by a BFS) from source to sink.
- * Set the log level to FINEST to see more detail.
  */
 
 public class EdmondsKarpAlgorithm implements MaxFlowAlgorithm {
