@@ -2,6 +2,7 @@ package com.ictools.algorithms.graph.maxflow;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Table;
 import com.ictools.algorithms.graph.structures.DefaultingTable;
 import com.ictools.algorithms.graph.structures.WeightedGraph;
 import javafx.util.Pair;
@@ -37,32 +38,37 @@ public class PushRelabelAlgorithm implements MaxFlowAlgorithm {
         initializeDataStructures();
         fireSaturatingPushes();
 
-        Set<Pair<Long, Long>> edges = flowNetwork.getGraph().getEdges();
-
         while (!outstandingNodes.isEmpty()) {
             long source = outstandingNodes.pollFirst();
-            if (source == flowNetwork.getSink()) {
-                continue;
-            }
 
+            Set<Pair<Long, Long>> edges = residualGraph.cellSet()
+                    .stream()
+                    .map(cell -> new Pair<>(cell.getRowKey(), cell.getColumnKey()))
+                    .collect(Collectors.toSet());
             Set<Pair<Long, Long>> pushableEdges = edges.stream()
                     .filter(edge -> edge.getKey() == source)
-                    .filter(edge -> residualGraph.get(source, edge.getValue()) > 0)
+                    .filter(edge -> residualGraph.get(source, edge.getValue()) > 0l)
                     .filter(edge -> nodeHeights.get(source) > nodeHeights.get(edge.getValue()))
                     .collect(Collectors.toSet());
+
             // Pick one
             if (!pushableEdges.isEmpty()) {
                 Pair<Long, Long> targetEdge = pushableEdges.iterator().next();
                 push(source, targetEdge.getValue(),
                         Math.min(nodeExcessFlows.get(source),
                                 residualGraph.get(source, targetEdge.getValue())));
+                if (nodeExcessFlows.get(source) > 0) {
+                    outstandingNodes.addLast(source);
+                }
+                if (nodeExcessFlows.get(targetEdge.getValue()) > 0) {
+                    outstandingNodes.addLast(targetEdge.getValue());
+                }
             } else {
                 relabel(source);
                 outstandingNodes.addLast(source);
             }
-
         }
-        return new MaxFlowResult(flow, nodeExcessFlows.get(flowNetwork.getSink()));
+        return FlowConsolidationUtils.resolveAndConsolidateFlows(flowNetwork, flow);
     }
 
     private void initializeDataStructures() {
@@ -93,10 +99,13 @@ public class PushRelabelAlgorithm implements MaxFlowAlgorithm {
     }
 
     private void push(long from, long to, long amount) {
-        if (from != flowNetwork.getSource()) {
+        if (from != flowNetwork.getSource() && from != flowNetwork.getSink()) {
             nodeExcessFlows.put(from, nodeExcessFlows.get(from) - amount);
         }
-        nodeExcessFlows.put(to, nodeExcessFlows.get(to) + amount);
+
+        if (to != flowNetwork.getSource() && to != flowNetwork.getSink()) {
+            nodeExcessFlows.put(to, nodeExcessFlows.get(to) + amount);
+        }
 
         long newCapacity = residualGraph.get(from, to) - amount;
         if (newCapacity > 0) {
@@ -104,7 +113,7 @@ public class PushRelabelAlgorithm implements MaxFlowAlgorithm {
         } else {
             residualGraph.remove(from, to);
         }
-        residualGraph.put(from, to, residualGraph.get(from, to) + amount);
+        residualGraph.put(to, from, residualGraph.get(to, from) + amount);
         flow.put(from, to, flow.get(from, to) + amount);
     }
 

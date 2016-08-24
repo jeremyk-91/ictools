@@ -20,6 +20,15 @@ public class EdmondsKarpAlgorithmTest {
     }
 
     @Test
+    public void testEdmondsKarpAlgorithmMedium() {
+        FlowNetwork flowNetwork = TestFlowNetworks.getTestFlowNetworkMedium();
+        EdmondsKarpAlgorithm edmondsKarpAlgorithm = new EdmondsKarpAlgorithm(flowNetwork);
+        MaxFlowResult result = edmondsKarpAlgorithm.computeMaxFlow();
+
+        assertThat(result.getMaximumFlowValue(), is(10l));
+    }
+
+    @Test
     public void testEdmondsKarpAlgorithmPathological() {
         FlowNetwork pathologicalNetwork = TestFlowNetworks.getTestFlowNetworkPathological();
         EdmondsKarpAlgorithm edmondsKarpAlgorithm = new EdmondsKarpAlgorithm(pathologicalNetwork);

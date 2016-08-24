@@ -39,8 +39,7 @@ public class EdmondsKarpAlgorithm implements MaxFlowAlgorithm {
             augmentPath(augmentingPath);
             augmentingPath = BreadthFirstSearch.findPath(residualGraph, flowNetwork.getSource(), flowNetwork.getSink());
         }
-        log.info("Final flow from the max flow computation is " + flow);
-        return new MaxFlowResult(flow, flowValue);
+        return FlowConsolidationUtils.resolveAndConsolidateFlows(flowNetwork, flow);
     }
 
     private void augmentPath(List<Pair<Long, Long>> augmentingPath) {

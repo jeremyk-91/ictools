@@ -20,6 +20,15 @@ public class PushRelabelAlgorithmTest {
     }
 
     @Test
+    public void testPushRelabelAlgorithmMedium() {
+        FlowNetwork flowNetwork = TestFlowNetworks.getTestFlowNetworkMedium();
+        PushRelabelAlgorithm pushRelabelAlgorithm = new PushRelabelAlgorithm(flowNetwork);
+        MaxFlowResult result = pushRelabelAlgorithm.computeMaxFlow();
+
+        assertThat(result.getMaximumFlowValue(), is(10l));
+    }
+
+    @Test
     public void testPushRelabelAlgorithmPathological() {
         FlowNetwork pathologicalNetwork = TestFlowNetworks.getTestFlowNetworkPathological();
         PushRelabelAlgorithm pushRelabelAlgorithm = new PushRelabelAlgorithm(pathologicalNetwork);
