@@ -9,10 +9,13 @@ import javafx.util.Pair;
 import org.junit.Test;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 
 public class BreadthFirstSearchTest {
@@ -83,6 +86,47 @@ public class BreadthFirstSearchTest {
 
         List<Pair<Long, Long>> result = BreadthFirstSearch.findPath(graph, 0l, 5l);
         assertThat(result, is(nullValue()));
+    }
+
+    @Test
+    public void testBreadthFirstSearch_Distances() {
+        Table<Long, Long, Long> adjacencyMatrix = HashBasedTable.create();
+        adjacencyMatrix.put(0l, 1l, 75l);
+        adjacencyMatrix.put(1l, 2l, 43l);
+        adjacencyMatrix.put(2l, 3l, 99l);
+        adjacencyMatrix.put(3l, 0l, 66l);
+        adjacencyMatrix.put(1l, 4l, 11l);
+        adjacencyMatrix.put(5l, 4l, 11l);
+        Graph graph = new TableGraph(adjacencyMatrix);
+
+        Map<Long, Long> result = BreadthFirstSearch.findDistances(graph, 0l);
+        assertThat(result.get(0l), is(0l));
+        assertThat(result.get(1l), is(1l));
+        assertThat(result.get(2l), is(2l));
+        assertThat(result.get(3l), is(3l));
+        assertThat(result.get(4l), is(2l));
+        assertThat(result.get(5l), is(nullValue()));
+    }
+
+    @Test
+    public void testBreadthFirstSearch_LevelGraph() {
+        Table<Long, Long, Long> adjacencyMatrix = HashBasedTable.create();
+        adjacencyMatrix.put(0l, 1l, 75l);
+        adjacencyMatrix.put(1l, 2l, 43l);
+        adjacencyMatrix.put(2l, 3l, 99l);
+        adjacencyMatrix.put(3l, 0l, 66l);
+        adjacencyMatrix.put(1l, 4l, 11l);
+        adjacencyMatrix.put(5l, 4l, 11l);
+        Graph graph = new TableGraph(adjacencyMatrix);
+
+        Map<Long, List<Long>> result = BreadthFirstSearch.findLevelGraph(graph, 0l);
+        assertThat(result.get(0l), containsInAnyOrder(1l));
+        assertThat(result.get(1l), containsInAnyOrder(2l, 4l));
+        assertThat(result.get(2l), containsInAnyOrder(3l));
+        assertThat(result.get(3l), empty());
+        assertThat(result.get(4l), empty());
+        assertThat(result.get(5l), is(nullValue()));
+
     }
 
 }
