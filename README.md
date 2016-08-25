@@ -4,10 +4,10 @@
 
 # Modules Supported
 
-- C493 Intelligent Data and Probabilistic Inference (coming soon)
-  - Probability Propagation in Bayesian Networks
-  - Message Propagation
-  - Cause and Independence
-  - Dependency Metrics
-  - Principal Components Analysis
-  - Linear Discriminant Analysis
+- C220 Software Engineering Algorithms
+  - Graph Algorithms
+    - Fundamentals
+      - Breadth-First Search
+    - Maximum Flow
+      - Ford-Fulkerson (implemented as Edmonds-Karp)
+      - Push-Relabel (not in syllabus)
