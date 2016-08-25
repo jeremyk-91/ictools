@@ -5,4 +5,9 @@
 # Modules Supported
 
 - C220 Software Engineering Algorithms
-  - Ford-Fulkerson (implemented via Edmonds-Karp)
+  - Graph Algorithms
+    - Fundamentals
+      - Breadth-First Search
+    - Maximum Flow
+      - Ford-Fulkerson (implemented as Edmonds-Karp)
+      - Push-Relabel (not in syllabus)
