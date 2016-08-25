@@ -35,11 +35,13 @@ public class RandomDifferentialFlowTest {
 
             MaxFlowResult edmondsKarpResult = new EdmondsKarpAlgorithm(flowNetwork).computeMaxFlow();
             MaxFlowResult pushRelabelResult = new PushRelabelAlgorithm(flowNetwork).computeMaxFlow();
+            MaxFlowResult dinicsResult = new DinicsAlgorithm(flowNetwork).computeMaxFlow();
 
             // There can be multiple solutions. So we only check the flow values which must be equal
             // e.g. (1) --> (2) branches to (3), (4), both go in to (5) which is the sink
             // It's OK to use 1235 or 1245, so the edges on which flow actually travels differ.
             assertThat(edmondsKarpResult.getMaximumFlowValue(), is(pushRelabelResult.getMaximumFlowValue()));
+            assertThat(edmondsKarpResult.getMaximumFlowValue(), is(dinicsResult.getMaximumFlowValue()));
         }
     }
 }

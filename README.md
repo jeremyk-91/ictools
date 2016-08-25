@@ -7,7 +7,8 @@
 - C220 Software Engineering Algorithms
   - Graph Algorithms
     - Fundamentals
-      - Breadth-First Search
+      - Breadth-First Search (plus a few simple variants)
     - Maximum Flow
       - Ford-Fulkerson (implemented as Edmonds-Karp)
+      - Dinic's algorithm (blocking flows; not in syllabus)
       - Push-Relabel (not in syllabus)
