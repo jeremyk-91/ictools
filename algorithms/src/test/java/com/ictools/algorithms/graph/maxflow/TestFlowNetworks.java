@@ -48,4 +48,11 @@ public final class TestFlowNetworks {
         return new FlowNetwork(new TableGraph(table), 0l, 3l);
     }
 
+    public static FlowNetwork getTestFlowNetworkFork() {
+        HashBasedTable<Long, Long, Long> table = HashBasedTable.create(3, 3);
+        table.put(0l, 1l, 5l);
+        table.put(1l, 2l, 7l);
+        table.put(0l, 2l, 9l);
+        return new FlowNetwork(new TableGraph(table), 0l, 2l);
+    }
 }

@@ -48,6 +48,9 @@ public class PushRelabelAlgorithm implements MaxFlowAlgorithm {
 
         while (!outstandingNodes.isEmpty()) {
             long source = outstandingNodes.pollFirst();
+            if (source == flowNetwork.getSink()) {
+                continue;
+            }
 
             Set<Pair<Long, Long>> edges = residualGraph.cellSet()
                     .stream()
