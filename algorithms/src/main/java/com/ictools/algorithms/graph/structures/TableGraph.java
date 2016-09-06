@@ -12,9 +12,12 @@ import java.util.stream.Collectors;
 public class TableGraph implements WeightedGraph {
 
     private final Table<Long, Long, Long> graph;
+    private final Set<Long> nodeCache;
 
     public TableGraph(Table<Long, Long, Long> graph) {
-        this.graph = graph;
+        this.graph = HashBasedTable.create(graph);
+        this.nodeCache = Sets.newHashSet(graph.rowKeySet());
+        nodeCache.addAll(graph.columnKeySet());
     }
 
     @Override
@@ -30,10 +33,7 @@ public class TableGraph implements WeightedGraph {
 
     @Override
     public Set<Long> getNodes() {
-        // TODO Implement caching so the expensive set union gets amortised
-        Set<Long> outgoingNodes = Sets.newHashSet(graph.columnKeySet());
-        outgoingNodes.addAll(graph.rowKeySet());
-        return outgoingNodes;
+        return nodeCache;
     }
 
     @Override
